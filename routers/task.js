@@ -4,8 +4,9 @@ const Task = require('../models/task');
 const auth = require('../middlewear/auth');
 const { compareSync } = require('bcrypt');
 const router = express.Router();
-const { getAsync , setAsync } = require('../services/redis')
+const client  = require('../services/redis')
 const getTask = require('../middlewear/cache')
+
 
 router.post('/tasks' , auth , async (req,res) => {
 
@@ -23,20 +24,23 @@ router.post('/tasks' , auth , async (req,res) => {
     }) }
 })
 
-router.get('/tasks/:id' , auth , getTask ,async (req,res)=>{
+router.get('/tasks/:id' , auth ,getTask , async (req,res)=>{
     const _id = req.params.id
-
     try {
     const task = await Task.findOne({_id, owner: req.user._id})
-        await setAsync( _id , JSON.stringify(task), {
-            EX: 3600 ,
-            NX: true
-        })
-        res.send({
+    if(task) {
+        console.log('Data is not present in cache'); 
+    await client.set( _id , JSON.stringify(task), {
+        EX: 3600 ,
+        NX: true
+    })
+    res.status(200).send({
         fromCache: false,
         data: task,
       })
-    } 
+    
+    }
+} 
     catch(e) { res.status(500).send('not found')}
 })
 

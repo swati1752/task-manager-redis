@@ -1,4 +1,3 @@
-const { promisify } = require('util');
 const redis = require('redis');
 
 const client = redis.createClient({
@@ -13,18 +12,9 @@ client.on('error', function (err) {
     console.log('Redis error: ' + err);
 });
 
-const dict = {
-    
-}
+module.exports = client ;
 
-const task_list = [
-    
-]
 
-module.exports = {
-    getAsync: promisify(client.get).bind(client),
-    setAsync: promisify(client.set).bind(client),
-  };
 
 //   const cachedTasks = await redis.getAsync('tasks');
 

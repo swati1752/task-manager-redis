@@ -1,28 +1,28 @@
-const { getAsync , setAsync  } = require("../services/redis");
+const client = require("../services/redis");
 
-var TaskCache = []
 
 const getTask = async ( req, res, next) =>{
     const TaskId = req.params.id;
     var task;
-
+    
     try {
-        const cacheRes = await getAsync(TaskId);
+        
+        const cacheRes = await client.get(TaskId);
         if( cacheRes){
             // isCached = true;
             task = JSON.parse(cacheRes);
+            console.log('Data is present in cache');
             res.send({
                 fromCache: true,
                 data: task,
               });
         }
         else {
-            next()
+            next();
         }
-
     }
     catch (error) {
-      console.error(error);
+      console.log(error);
       res.status(404).send("Data unavailable");
     }
 }

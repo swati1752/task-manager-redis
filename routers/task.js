@@ -4,8 +4,11 @@ const Task = require('../models/task');
 const auth = require('../middlewear/auth');
 const { compareSync } = require('bcrypt');
 const router = express.Router();
+const { getAsync , setAsync } = require('../services/redis')
+const getTask = require('../middlewear/cache')
 
 router.post('/tasks' , auth , async (req,res) => {
+
     const task = await Task({
         ...req.body,
         owner: req.user._id
@@ -14,15 +17,25 @@ router.post('/tasks' , auth , async (req,res) => {
         await task.save()
         res.status(200).send(task)
     }
-
-    catch (e) { res.send('404 ERROR') }
+    catch (e) { console.log(e); res.send({
+        statusCode:'400',
+        msg:error
+    }) }
 })
 
-router.get('/tasks/:id' , auth ,async (req,res)=>{
+router.get('/tasks/:id' , auth , getTask ,async (req,res)=>{
     const _id = req.params.id
+
     try {
     const task = await Task.findOne({_id, owner: req.user._id})
-    res.send(task)
+        await setAsync( _id , JSON.stringify(task), {
+            EX: 3600 ,
+            NX: true
+        })
+        res.send({
+        fromCache: false,
+        data: task,
+      })
     } 
     catch(e) { res.status(500).send('not found')}
 })

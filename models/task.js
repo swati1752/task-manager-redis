@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 const moment = require('moment-timezone');
 const validator = require('validator');
 
+
 const TaskSchema = new mongoose.Schema({
+    name: {
+        type:String,
+        required:true,
+        trim:true
+    },
     description:{
         type:String,
         required:true,

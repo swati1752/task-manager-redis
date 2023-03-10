@@ -60,6 +60,12 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     }
 })
 
+router.get('/' , async (req, res) =>{
+    res.send({
+        msg:'test'
+    })
+})
+
 // create user
 router.post('/users' , async(req,res) => {
     const user = new User(req.body)

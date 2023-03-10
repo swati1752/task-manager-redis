@@ -1,42 +1,10 @@
 const express = require('express');
 const { ObjectId } = require('mongoose');
-const multer = require('multer');
-const sharp = require('sharp');
 const User = require('../models/user'); 
 const {sendWelcomeEmail , sendDelEmail} = require('../emails/myacc')
 const auth = require('../middlewear/auth.js');
 const router = express.Router();
 
-
-const upload = multer({
-    limits:{
-        fileSize:1000000
-    },
-    fileFilter(req, file ,cb){
-        if(!file.originalname.match(/\.(jpg|png|jpeg)$/)){
-            return cb(new Error('Please upload a image file'))
-        }
-        cb(undefined , true)
-    } 
-})
-
-router.post('/users/me/avatar' , auth , upload.single('avatar') ,async(req,res) =>{
-    const buffer = await sharp(req.file.buffer).resize({
-        width: 250,
-        height: 250
-    }).png().toBuffer()
-    req.user.avatar = buffer
-    await req.user.save()
-    res.send("image recieved")
-},(error , req, res, next) => {
-    res.status(400).send({error: error.message})
-})
-
-router.delete('/users/me/avatar' , auth , async(req,res) =>{
-    req.user.avatar = undefined
-    await req.user.save()
-    res.send()
-})
 
 router.get('/users/:id/avatar' , async(req,res) =>{
     try {

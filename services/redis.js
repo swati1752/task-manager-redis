@@ -14,17 +14,3 @@ client.on('error', function (err) {
 
 module.exports = client ;
 
-
-
-//   const cachedTasks = await redis.getAsync('tasks');
-
-//   if (cachedTasks) {
-//     const tasks = JSON.parse(cachedTasks);
-//     console.log('Data is present in cache');
-//     res.json(tasks);
-//   } else {
-//     const tasks = await Task.find();
-//     await redis.setAsync('tasks', JSON.stringify(tasks));
-//     console.log('Data is not present in cache');
-//     res.json(tasks);
-//   }
